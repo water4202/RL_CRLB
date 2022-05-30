@@ -20,7 +20,7 @@
 	</group>
 
     <!-- UAV0 -->
-    <group ns="iris_camera">
+    <group ns="iris_bearing">
         <!-- MAVROS and vehicle configs -->
         <arg name="ID" value="0"/>
         <arg name="fcu_url" default="udp://:14540@localhost:14580"/>
@@ -32,14 +32,14 @@
             <arg name="R" value="0"/>
             <arg name="P" value="0"/>
             <arg name="Y" value="0"/>
-            <arg name="vehicle" value="iris_depth_camera"/>
+            <arg name="vehicle" value="iris"/>
             <arg name="mavlink_udp_port" value="14560"/>
             <arg name="mavlink_tcp_port" value="4560"/>
             <arg name="ID" value="$(arg ID)"/>
             <arg name="gst_udp_port" value="$(eval 5600 + arg('ID'))"/>
             <arg name="video_uri" value="$(eval 5600 + arg('ID'))"/>
             <arg name="mavlink_cam_udp_port" value="$(eval 14530 + arg('ID'))"/>
-			<arg name="type" value="camera"/>
+			<arg name="type" value="bearing"/>
         </include>
         <!-- MAVROS -->
         <include file="$(find mavros)/launch/px4.launch">
@@ -51,7 +51,7 @@
     </group>
 
 	<node name="ArmandOffboard" pkg="rl_crlb" type="px4_mavros.py" output="screen" />
-	<param name="iris_camera/vel_control" type="int" value="0" />
+	<param name="iris_bearing/vel_control" type="int" value="0" />
 
 </launch>
 <!-- to add more UAVs (up to 10):

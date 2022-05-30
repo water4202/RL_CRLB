@@ -113,14 +113,14 @@ class Px4Controller:
 if __name__ == '__main__':
     try:
         rospy.init_node('ArmandOffboard')
-        uavtype = ["iris_camera"]
-        px4_camera = Px4Controller(uavtype[0])
-        px4_camera.OffboardandArm()
-        last_time_camera = rospy.Time.now()
+        uavtype = ["iris_bearing"]
+        px4_bearing = Px4Controller(uavtype[0])
+        px4_bearing.OffboardandArm()
+        last_time_bearing = rospy.Time.now()
         while not rospy.is_shutdown():
-            if rospy.Time.now() - last_time_camera > rospy.Duration(10):
-                if not px4_camera.current_state.armed or px4_camera.current_state.mode != "OFFBOARD":
-                	px4_camera.OffboardandArm()
-                	last_time_camera = rospy.Time.now()
+            if rospy.Time.now() - last_time_bearing > rospy.Duration(10):
+                if not px4_bearing.current_state.armed or px4_bearing.current_state.mode != "OFFBOARD":
+                	px4_bearing.OffboardandArm()
+                	last_time_bearing = rospy.Time.now()
     except rospy.ROSInterruptException:
         pass 
