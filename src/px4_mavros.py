@@ -58,19 +58,21 @@ class Px4Controller:
         self.x = data.pose.pose.position.x
         self.y = data.pose.pose.position.y
         self.z = data.pose.pose.position.z
+        self.w = self.q2yaw(data.pose.pose.orientation)
         if rospy.get_param(self.type +"/vel_control") == 0:
             self.constHeight()
-    
+
     def constHeight(self):
         self.local_cmd.twist.linear.x = (self.desired_x - self.x)
         self.local_cmd.twist.linear.y = (self.desired_y - self.y)
         self.local_cmd.twist.linear.z = (self.desired_z - self.z)
+        self.local_cmd.twist.angular.z = (0 - self.w)
         self.vel_pub.publish(self.local_cmd)
 
     def OffboardandArm(self):
         self.arm_state = self.arm()
         self.offboard_state = self.offboard()
-        
+
     def vel_control(self,msg):
         rospy.set_param(self.type +"/vel_control",1)
         self.cmd_vel.header.stamp = rospy.Time.now()
@@ -86,7 +88,7 @@ class Px4Controller:
         self.received_imu = True
         self.theta.data = [self.current_heading]
         self.theta_pub.publish(self.theta)
-        
+
     def q2yaw(self, q):
         if isinstance(q, Quaternion):
             rotate_z_rad = q.yaw_pitch_roll[0]
@@ -94,8 +96,8 @@ class Px4Controller:
             q_ = Quaternion(q.w, q.x, q.y, q.z)
             rotate_z_rad = q_.yaw_pitch_roll[0]
 
-        return rotate_z_rad    
-        
+        return rotate_z_rad
+
     def arm(self):
         if self.armService(True):
             return True
@@ -109,7 +111,7 @@ class Px4Controller:
         else:
             print(self.type +"Vechile Offboard failed")
             return False
-            
+
 if __name__ == '__main__':
     try:
         rospy.init_node('ArmandOffboard')
@@ -123,4 +125,4 @@ if __name__ == '__main__':
                 	px4_bearing.OffboardandArm()
                 	last_time_bearing = rospy.Time.now()
     except rospy.ROSInterruptException:
-        pass 
+        pass
