@@ -15,25 +15,29 @@ class CarNavigation:
         rospy.set_param("/car_navigation/start", 0)
 
     def start(self):
-        self.car1_cmd_vel.linear.x = 0.1
+        self.vx = np.random.uniform(0, 0.2, 6)
+        self.vz = np.random.uniform(-0.4, 0.4, 6)
+        self.car1_cmd_vel.linear.x = self.vx[0]
+        self.car1_cmd_vel.angular.z = self.vz[0]
         self.car1_vel_pub.publish(self.car1_cmd_vel)
         self.time = 1
 
     def control(self):
         if self.time < 151:
-            self.car1_cmd_vel.linear.x = 0.2
+            self.car1_cmd_vel.linear.x = self.vx[1]
+            self.car1_cmd_vel.angular.z = self.vz[1]
         elif self.time < 301:
-            self.car1_cmd_vel.linear.x = 0.2
-            self.car1_cmd_vel.angular.z = -0.4
+            self.car1_cmd_vel.linear.x = self.vx[2]
+            self.car1_cmd_vel.angular.z = self.vz[2]
         elif self.time < 376:
-            self.car1_cmd_vel.linear.x = 0.2
-            self.car1_cmd_vel.angular.z = 0.0
+            self.car1_cmd_vel.linear.x = self.vx[3]
+            self.car1_cmd_vel.angular.z = self.vz[3]
         elif self.time < 526:
-            self.car1_cmd_vel.linear.x = 0.2
-            self.car1_cmd_vel.angular.z = 0.4
+            self.car1_cmd_vel.linear.x = self.vx[4]
+            self.car1_cmd_vel.angular.z = self.vz[4]
         elif self.time < 601:
-            self.car1_cmd_vel.linear.x = 0.2
-            self.car1_cmd_vel.angular.z = 0.0
+            self.car1_cmd_vel.linear.x = self.vx[5]
+            self.car1_cmd_vel.angular.z = self.vz[5]
 
         self.car1_vel_pub.publish(self.car1_cmd_vel)
         self.time = self.time+1

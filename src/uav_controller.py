@@ -23,7 +23,7 @@ def odom(msg):
 
 	P1 = np.array([msg.data[0], msg.data[1], msg.data[2]])
 	Pb = np.array(msg.data[6:9])
-	
+
 	A = np.array([ \
 				  (-2*(Pb-P1)[:2]).tolist()+[0], \
 				  [0]*2+[-1], \
@@ -39,7 +39,7 @@ def odom(msg):
 
 def qp_ini():
 	global m,x
-	
+
 	m = gp.Model("qp")
 	#m.setParam("NonConvex", 2.0)
 	m.setParam("LogToConsole",0)
@@ -57,7 +57,7 @@ def	qpsolver():
 	m.setObjective(obj)
 
 	m.remove(m.getConstrs())
-	
+
 	for i in range (b.size):
 		addCons(i)
 
@@ -65,13 +65,13 @@ def	qpsolver():
 	optimal = m.getVars()
 	#print(A.dot(np.array([optimal[0].X,optimal[1].X,optimal[2].X])) - b)
 	#print(optimal[0].X,optimal[1].X,optimal[2].X)
-	
+
 	bearing_cmd_vel.linear.x = optimal[0].X
 	bearing_cmd_vel.linear.y = optimal[1].X
 	bearing_cmd_vel.linear.z = optimal[2].X
-	
+
 	px4_bearing.vel_control(bearing_cmd_vel)
-	
+
 if __name__ == '__main__':
 	try:
 		rospy.init_node('controller')
@@ -82,7 +82,7 @@ if __name__ == '__main__':
 			rate.sleep()
 
 		qp_ini()
-		while not rospy.is_shutdown():		
+		while not rospy.is_shutdown():
 			qpsolver()
 			rate.sleep()
 	except rospy.ROSInterruptException:
