@@ -10,14 +10,13 @@ from agent import TD3
 from utils.replay_buffer import ReplayBuffer
 
 if __name__ == "__main__":
-    rospy.init_node("train_node")
+    rospy.init_node("test_node")
     parser = argparse.ArgumentParser()
     ###################   Environment Argument   ###################
     parser.add_argument("--episode_num", default=10000, type=int, help="Specify total training episodes")
     parser.add_argument("--max_timesteps", default=100000, type=int, help="Sepcify max timesteps for each episode")
     ###################   Policy Argument   ###################
     parser.add_argument("--policy", default="TD3", type=str, choices=["TD3", "NFWPO"], help="Choose a policy to interact with environment")
-    parser.add_argument("--expl_timesteps", default=25000, type=int, help="Total timesteps for agent to do random exploration")
     parser.add_argument("--noise_scale", default=0.2, type=float, help="The scale of Gaussian noise")
     parser.add_argument("--max_noise", default=0.5, type=float, help="Maximum ratio value of noise to max action")
     parser.add_argument("--discount", default=0.99, type=float, help="Discount factor (gamma)")
@@ -26,10 +25,7 @@ if __name__ == "__main__":
     ###################   Training Argument   ###################
     parser.add_argument("--name", default="", type=str, help="The name of the simulation")
     parser.add_argument("--seed", type=int, help="Set random seed")
-    parser.add_argument("--batch_size", default=1024, type=int, help="Training batch size")
-    parser.add_argument("--save_freq", default=5, help="Saving model every X episodes")
-    parser.add_argument("--save_model", action="store_true", help="Save the model or not")
-    parser.add_argument("--pretrained_model", default="", type=str, help="Load a pretrained model")
+    parser.add_argument("--load_model", default="", type=str, help="Load a pretrained model")
     parser.add_argument("--save_buffer", action="store_true", help="Save the replay buffer or not")
     parser.add_argument("--load_buffer", default="", type=str, help="Load a replay buffer")
     args = parser.parse_args()
@@ -54,8 +50,10 @@ if __name__ == "__main__":
     else:
         exit(f"[Error] \033[91mPolicy {args.policy} not supported\033[0m")
 
-    if args.pretrained_model != "":
+    if args.load_model != "":
         agent.load_model(args.pretrained_model)
+    else:
+        exit(f"[Error] \033[91mNo model loaded\033[0m")
 
     # create replay buffer
     replay_buffer = ReplayBuffer(state_dim, action_dim)
@@ -71,15 +69,15 @@ if __name__ == "__main__":
         np.random.seed(args.seed)
 
     # record simulation data
-    if not os.path.exists("./simulation/train"):
-        os.makedirs("./simulation/train")
+    if not os.path.exists("./simulation/test"):
+        os.makedirs("./simulation/test")
 
     if args.name == "":
         simulation_name = f"{args.env}_{args.policy}"
     else:
         simulation_name = args.name
 
-    save_path = f"./simulation/train/{simulation_name}"
+    save_path = f"./simulation/test/{simulation_name}"
     if os.path.exists(save_path):
         save_path_serial = 1
         while os.path.exists(f"{save_path}_{save_path_serial}"):
@@ -107,11 +105,7 @@ if __name__ == "__main__":
             state = env.reset()
 
             for t in range(args.max_timesteps):
-                if args.pretrained_model != "" or replay_buffer.size > args.expl_timesteps:
-                    policy_noise = np.random.normal(0, max_action * args.noise_scale/2, size=action_dim)
-                    action = (agent.select_action(state) + policy_noise).clip(min_action, max_action)
-                else:
-                    action = env.action_space.sample()
+                action = (agent.select_action(state)).clip(min_action, max_action)
 
                 next_state, reward, done, _ = env.step(action)
                 episode_reward += reward
@@ -122,12 +116,6 @@ if __name__ == "__main__":
                 writer.add_scalar("Action/Velocity_Z", action[2], global_steps+1)
                 global_steps += 1
 
-                if replay_buffer.size >= args.expl_timesteps:
-                    batch_states, batch_actions, batch_rewards, batch_next_states, batch_dones = replay_buffer.sample(args.batch_size)
-                    agent.train(batch_states, batch_actions, batch_rewards, batch_next_states, batch_dones)
-                    writer.add_scalar("Loss/Critic_Loss", agent.critic_loss, agent.total_iter)
-                    writer.add_scalar("Loss/Actor_Loss", agent.actor_loss, agent.total_iter)
-
                 if done:
                     break
                 state = next_state
@@ -135,16 +123,11 @@ if __name__ == "__main__":
             print(f"[INFO] Episode Reward: {episode_reward}, Data: {replay_buffer.size}")
             writer.add_scalar("Reward/Episode_Reward", episode_reward, ep+1)
 
-            if args.save_model and replay_buffer.size >= args.expl_timesteps and (ep + 1) % args.save_freq == 0:
-                agent.save_model(save_path + f"/weights/ep_{ep+1}.ckpt")
             print()
 
     except Exception as e:
         print("\033[93m" + str(e) + "\033[0m")
 
     finally:
-        if args.save_model:
-            agent.save_model(save_path + "/weights/final.ckpt")
-
         if args.save_buffer:
             replay_buffer.save(save_path + "/replay_buffer.npz")

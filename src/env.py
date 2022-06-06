@@ -145,9 +145,13 @@ class Env(gym.Env):
             self.m.addConstr(A[i,0]*self.x[0] + A[i,1]*self.x[1] + A[i,2]*self.x[2] <= b[i], "c"+str(i))
 
         self.m.optimize()
-        optimal = self.m.getVars()
+        if self.m.status == gp.GRB.OPTIMAL:
+            optimal = self.m.getVars()
+            action = np.array([optimal[0].x, optimal[1].x, optimal[2].x])
+        else:
+            action = np.array([0, 0, 0])
 
-        return np.array([optimal[0].x, optimal[1].x, optimal[2].x])
+        return action
 
 if __name__ == "__main__":
     rospy.init_node("env_node")
