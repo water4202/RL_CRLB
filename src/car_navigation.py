@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 import rospy
+import rosnode
 import numpy as np
 from geometry_msgs.msg import Twist
 
-class CarNavigation:
+class CarTrain:
     def __init__(self):
         self.car1_vel_pub = rospy.Publisher("/car1/cmd_vel",Twist,queue_size=1)
         self.rate = rospy.Rate(20)
@@ -49,45 +50,60 @@ class CarNavigation:
         self.time = 0
         rospy.set_param("/car_navigation/start", 0)
 
-"""
-def start():
-    global car1_cmd_vel,time
-    car1_cmd_vel.linear.x = 0.1
-    car1_vel_pub.publish(car1_cmd_vel)
-    time = 1
+class CarTest:
+    def __init__(self):
+        self.car1_vel_pub = rospy.Publisher("/car1/cmd_vel",Twist,queue_size=1)
+        self.rate = rospy.Rate(20)
 
-def control():
-    global car1_cmd_vel,time
+        self.car1_cmd_vel = Twist()
+        self.time = 0
 
-    if time < 151:
-        car1_cmd_vel.linear.x = 0.2
-    elif time < 301:
-        car1_cmd_vel.linear.x = 0.2
-        car1_cmd_vel.angular.z = -0.4
-    elif time < 376:
-        car1_cmd_vel.linear.x = 0.2
-        car1_cmd_vel.angular.z = 0.0
-    elif time < 526:
-        car1_cmd_vel.linear.x = 0.2
-        car1_cmd_vel.angular.z = 0.4
-    elif time < 601:
-        car1_cmd_vel.linear.x = 0.2
-        car1_cmd_vel.angular.z = 0.0
+        rospy.set_param("/car_navigation/start", 0)
 
-    car1_vel_pub.publish(car1_cmd_vel)
-    time = time+1
+    def start(self):
+        self.car1_cmd_vel.linear.x = 0.1
+        self.car1_cmd_vel.angular.z = 0.0
+        self.car1_vel_pub.publish(self.car1_cmd_vel)
+        self.time = 1
 
-def stop():
-    global car1_cmd_vel
-    car1_cmd_vel.linear.x = 0.0
-    car1_cmd_vel.angular.z = 0.0
-    car1_vel_pub.publish(car1_cmd_vel)
-"""
+    def control(self):
+        if self.time < 151:
+            self.car1_cmd_vel.linear.x = 0.2
+            self.car1_cmd_vel.angular.z = 0.0
+        elif self.time < 301:
+            self.car1_cmd_vel.linear.x = 0.2
+            self.car1_cmd_vel.angular.z = -0.4
+        elif self.time < 376:
+            self.car1_cmd_vel.linear.x = 0.2
+            self.car1_cmd_vel.angular.z = 0.0
+        elif self.time < 526:
+            self.car1_cmd_vel.linear.x = 0.2
+            self.car1_cmd_vel.angular.z = 0.4
+        elif self.time < 601:
+            self.car1_cmd_vel.linear.x = 0.2
+            self.car1_cmd_vel.angular.z = 0.0
+
+        self.car1_vel_pub.publish(self.car1_cmd_vel)
+        self.time = self.time+1
+
+    def stop(self):
+        self.car1_cmd_vel.linear.x = 0.0
+        self.car1_cmd_vel.angular.z = 0.0
+        self.car1_vel_pub.publish(self.car1_cmd_vel)
+        self.time = 0
+        rospy.set_param("/car_navigation/start", 0)
 
 if __name__ == '__main__':
     try:
         rospy.init_node('navigation')
-        car = CarNavigation()
+        car = None
+
+        while car is None:
+            if rosnode.rosnode_ping('/train_node', max_count=1) is True:
+                car = CarTrain()
+            if rosnode.rosnode_ping('/test_node', max_count=1) is True:
+                car = CarTest()
+
         while not rospy.is_shutdown():
             if rospy.get_param("/car_navigation/start") == 1:
                 if car.time == 0:
