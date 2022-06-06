@@ -51,7 +51,7 @@ if __name__ == "__main__":
         exit(f"[Error] \033[91mPolicy {args.policy} not supported\033[0m")
 
     if args.load_model != "":
-        agent.load_model(args.pretrained_model)
+        agent.load_model(args.load_model)
     else:
         exit(f"[Error] \033[91mNo model loaded\033[0m")
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         os.makedirs("./simulation/test")
 
     if args.name == "":
-        simulation_name = f"{args.env}_{args.policy}"
+        simulation_name = f"{args.policy}"
     else:
         simulation_name = args.name
 
@@ -85,8 +85,6 @@ if __name__ == "__main__":
         save_path += f"_{save_path_serial}"
         os.makedirs(save_path)
 
-    if args.save_model and not os.path.exists(save_path + "/weights"):
-        os.makedirs(save_path + "/weights")
     if not os.path.exists(save_path + "/logs"):
         os.makedirs(save_path + "/logs")
 

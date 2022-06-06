@@ -113,10 +113,11 @@ if __name__ == "__main__":
                 else:
                     action = env.action_space.sample()
 
-                next_state, reward, done, _ = env.step(action)
+                next_state, reward, done, info = env.step(action)
                 episode_reward += reward
 
-                replay_buffer.add(state, action, reward, next_state, done)
+                if t > 3:
+                    replay_buffer.add(state, info["constrained_action"], reward, next_state, done)
                 writer.add_scalar("Action/Velocity_X", action[0], global_steps+1)
                 writer.add_scalar("Action/Velocity_Y", action[1], global_steps+1)
                 writer.add_scalar("Action/Velocity_Z", action[2], global_steps+1)

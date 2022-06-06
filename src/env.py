@@ -19,6 +19,7 @@ class Env(gym.Env):
         self.height_u = 1.5
         self.d_safe_car = 0.7
         self.gamma = 1.0
+        self.r_last = 3.04
 
         # Gym-Like variable
         self._min_velocity, self._max_velocity = -0.3, 0.3
@@ -37,6 +38,7 @@ class Env(gym.Env):
         self._initialize()
 
     def reset(self):
+        self.r_last = 3.04
         self._move_to("car1", [0, 0, 0])
 
         rospy.set_param("/iris_bearing/vel_control", 0)
@@ -63,7 +65,7 @@ class Env(gym.Env):
         if rospy.get_param("/car_navigation/start") == 0:
             done = True
 
-        info = None
+        info = {"constrained_action": action}
 
         next_state = np.concatenate([self.Pb, self.P1[:2]])
 
@@ -98,7 +100,6 @@ class Env(gym.Env):
     def _get_reward(self):
         """
         TODO
-        """
         min_r_xy = 0.7
         min_r = np.sqrt(0.3**2 + 0.7**2)
         max_obs = 1 / (min_r_xy * min_r)
@@ -109,6 +110,16 @@ class Env(gym.Env):
         obs = 1 / (r_xy * r)
 
         reward = obs / max_obs
+        """
+        min_r = np.sqrt(0.3**2 + 0.7**2)
+        max_obs = 1 / min_r
+
+        P1, Pb = self.P1, self.Pb
+        r = np.sqrt( (P1[0] - Pb[0])**2 + (P1[1] - Pb[1])**2 + (P1[2] - Pb[2])**2 )
+        obs = 1 / r
+
+        reward = obs / max_obs + 10 * (self.r_last - r)
+        self.r_last = r
 
         return reward
 
