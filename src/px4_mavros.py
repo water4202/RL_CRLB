@@ -63,9 +63,9 @@ class Px4Controller:
             self.constHeight()
 
     def constHeight(self):
-        self.local_cmd.twist.linear.x = (self.desired_x - self.x)
-        self.local_cmd.twist.linear.y = (self.desired_y - self.y)
-        self.local_cmd.twist.linear.z = (self.desired_z - self.z)
+        self.local_cmd.twist.linear.x = max(min((self.desired_x - self.x), 3), -3)
+        self.local_cmd.twist.linear.y = max(min((self.desired_y - self.y), 3), -3)
+        self.local_cmd.twist.linear.z = max(min((self.desired_z - self.z), 3), -3)
         self.local_cmd.twist.angular.z = (0 - self.w)
         self.vel_pub.publish(self.local_cmd)
 

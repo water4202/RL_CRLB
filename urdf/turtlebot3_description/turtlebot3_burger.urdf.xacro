@@ -20,12 +20,6 @@
       </geometry>
       <material name="dark"/>
     </visual>
-    <collision>
-      <origin xyz="-0.032 0 0.070" rpy="0 0 0"/>
-      <geometry>
-        <box size="0.140 0.140 0.140"/>      
-      </geometry>
-    </collision>
     <inertial>
       <origin xyz="-0.032 0 0" rpy="0 0 0"/>
       <mass value="1"/>
@@ -40,7 +34,7 @@
     <child link="contact_sensor"/>
     <origin xyz="0.0 0.0 0.010" rpy="0 0 0"/>
   </joint>
-  
+
   <link name="contact_sensor">
     <visual>
       <origin xyz="-0.032 0 0.07" rpy="0 0 0"/>
@@ -49,13 +43,6 @@
       </geometry>
       <material name="white"/>
     </visual>
-    <collision>
-      <origin xyz="-0.032 0 0.07" rpy="0 0 0"/>
-      <max_contacts>100</max_contacts>
-      <geometry>
-        <cylinder length="0.02" radius="0.12"/>        
-      </geometry>
-    </collision>
     <inertial>
       <origin xyz="-0.032 0 0" rpy="0 0 0"/>
       <mass value="1"/>
@@ -174,13 +161,6 @@
       </geometry>
       <material name="dark"/>
     </visual>
-
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.04" radius="0.05"/>
-      </geometry>
-    </collision>
 
     <inertial>
       <mass value="0.01" />

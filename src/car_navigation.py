@@ -47,8 +47,7 @@ class CarTrain:
         self.car1_cmd_vel.linear.x = 0.0
         self.car1_cmd_vel.angular.z = 0.0
         self.car1_vel_pub.publish(self.car1_cmd_vel)
-        self.time = 0
-        rospy.set_param("/car_navigation/start", 0)
+        self.time = self.time+1
 
 class CarTest:
     def __init__(self):
@@ -90,8 +89,7 @@ class CarTest:
         self.car1_cmd_vel.linear.x = 0.0
         self.car1_cmd_vel.angular.z = 0.0
         self.car1_vel_pub.publish(self.car1_cmd_vel)
-        self.time = 0
-        rospy.set_param("/car_navigation/start", 0)
+        self.time = self.time+1
 
 if __name__ == '__main__':
     try:
@@ -110,8 +108,11 @@ if __name__ == '__main__':
                     car.start()
                 elif car.time < 601:
                     car.control()
-                else:
+                elif car.time < 701:
                     car.stop()
+                else:
+                    car.time = 0
+                    rospy.set_param("/car_navigation/start", 0)
             car.rate.sleep()
     except rospy.ROSInterruptException:
         pass
