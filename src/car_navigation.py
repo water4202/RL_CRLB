@@ -101,6 +101,9 @@ if __name__ == '__main__':
                 car = CarTrain()
             if rosnode.rosnode_ping('/test_node', max_count=1) is True:
                 car = CarTest()
+            if rosnode.rosnode_ping('/controller', max_count=1) is True and rosnode.rosnode_ping('/estimate', max_count=1) is True:
+                car = CarTest()
+                rospy.set_param("/car_navigation/start", 1)
 
         while not rospy.is_shutdown():
             if rospy.get_param("/car_navigation/start") == 1:

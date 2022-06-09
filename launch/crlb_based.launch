@@ -52,6 +52,7 @@
 
 	<node name="ArmandOffboard" pkg="rl_crlb" type="px4_mavros.py" output="screen" />
 	<param name="iris_bearing/vel_control" type="int" value="0" />
+	<param name="car_navigation/start" type="int" value="0" />
 
 </launch>
 <!-- to add more UAVs (up to 10):

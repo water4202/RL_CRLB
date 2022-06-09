@@ -8,7 +8,7 @@ from gazebo_msgs.msg import ModelStates
 from std_msgs.msg import Float64MultiArray
 from rosgraph_msgs.msg import Clock
 import rosbag
-bag = rosbag.Bag('crlb_based.bag', 'w')
+bag = rosbag.Bag('rl_based.bag', 'w')
 
 msgs = None
 P1,Pb,measurement = None,None,None
@@ -98,8 +98,12 @@ if __name__ == "__main__":
         rate = rospy.Rate(400)
         while P1 is None:
             rate.sleep()
+        while rospy.get_param("/car_navigation/start") != 1:
+            rate.sleep()
 
         while not rospy.is_shutdown():
+            if rospy.get_param("/car_navigation/start") == 0:
+                break
             '''
             msgs = rospy.wait_for_message('/gazebo/model_states', ModelStates)
             odom(msgs)

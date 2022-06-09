@@ -77,7 +77,7 @@ if __name__ == '__main__':
 		rospy.init_node('controller')
 		px4_bearing = Px4Controller("iris_bearing")
 		rospy.Subscriber('/state', Float64MultiArray, odom, queue_size=10)
-		rate = rospy.Rate(100)
+		rate = rospy.Rate(30)
 		while b is None:
 			rate.sleep()
 
