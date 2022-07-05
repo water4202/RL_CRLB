@@ -8,7 +8,7 @@ from math import sqrt
 sigma = 0.02
 optimal = [sigma**2*0.7*sqrt(0.3**2 + 0.7**2)]*50
 
-bag = rosbag.Bag('crlb_based_difdir.bag')
+bag = rosbag.Bag('crlb_based.bag')
 crlb_covariance=[]
 crlb_p1_error=[]
 crlb_time = []
@@ -34,7 +34,7 @@ bag.close()
 ini = crlb_time[0]
 crlb_time[:] = [x - ini for x in crlb_time]
 
-bag = rosbag.Bag('rl_based_difdir.bag')
+bag = rosbag.Bag('rl_based.bag')
 rl_covariance=[]
 rl_p1_error=[]
 rl_time = []
@@ -60,7 +60,7 @@ bag.close()
 ini = rl_time[0]
 rl_time[:] = [x - ini for x in rl_time]
 
-crlb_p1_avg_error = sum(crlb_p1_error[20:])/(len(crlb_p1_error)-20)
+crlb_p1_avg_error = sum(crlb_p1_error[20:12432])/(len(crlb_p1_error)-20-1706)
 print(crlb_p1_avg_error)
 crlb_p1_avg_error = [crlb_p1_avg_error]*len(crlb_p1_error)
 
@@ -68,7 +68,7 @@ rl_p1_avg_error = sum(rl_p1_error[20:])/(len(rl_p1_error)-20)
 print(rl_p1_avg_error)
 rl_p1_avg_error = [rl_p1_avg_error]*len(rl_p1_error)
 
-crlb_avg_covariance = sum(crlb_covariance[20:])/(len(crlb_covariance)-20)
+crlb_avg_covariance = sum(crlb_covariance[20:12432])/(len(crlb_covariance)-20-1706)
 print(crlb_avg_covariance)
 
 rl_avg_covariance = sum(rl_covariance[20:])/(len(rl_covariance)-20)
@@ -79,8 +79,8 @@ plt.plot(rl_time,rl,"b",label="rl_based")
 plt.plot(optimal, "k", linestyle='dashed')
 plt.ylabel('CRLB')
 plt.xlabel('time')
-plt.ylim(0, 0.007)
-plt.xlim(-0.5, 35)
+plt.ylim(0, 0.004)
+plt.xlim(-0.5, 30)
 plt.legend()
 plt.show()
 
@@ -89,7 +89,7 @@ plt.plot(rl_time,rl_covariance,"b",label="rl_based")
 plt.ylabel('det(P)')
 plt.xlabel('time')
 plt.ylim(1e-16, 1e-13)
-plt.xlim(-0.5, 35)
+plt.xlim(-0.5, 30)
 plt.legend()
 plt.show()
 '''
@@ -107,7 +107,7 @@ plt.plot(rl_time,rl_p1_avg_error,"k",linestyle="dotted",label="rl_based_mean")
 plt.ylabel('p1_error')
 plt.xlabel('time')
 plt.ylim(0, 0.3)
-plt.xlim(-0.5, 35)
+plt.xlim(-0.5, 30)
 plt.legend()
 plt.show()
 '''
